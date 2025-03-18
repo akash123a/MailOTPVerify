@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification</title>
+    <style>
+        body {
+font-family: Arial, sans-serif;
+background-color: #f4f4f4;
+text-align: center;
+padding: 50px;
+}
+
+.container {
+width: 300px;
+padding: 20px;
+background: white;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+margin: auto;
+border-radius: 8px;
+}
+
+h2 {
+color: #333;
+}
+
+.input-group {
+margin: 15px 0;
+}
+
+input {
+width: 90%;
+padding: 10px;
+margin: 5px 0;
+border: 1px solid #ccc;
+border-radius: 5px;
+}
+
+button {
+width: 100%;
+padding: 10px;
+background-color: #007bff;
+color: white;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+}
+
+button:hover {
+background-color: #0056b3;
+}
+
+#message {
+margin-top: 10px;
+color: red;
+}
+
+    </style>
+
+</head>
+<body>
+<div class="container">
+    <h2>OTP Verification</h2>
+
+    <!-- Email Input -->
+    <div class="input-group">
+        <label for="email">Enter your Email:</label>
+        <input type="email" id="email" placeholder="example@gmail.com">
+        <button onclick="sendOtp()">Send OTP</button>
+    </div>
+
+    <!-- OTP Input -->
+    <div class="input-group" id="otp-section" style="display: none;">
+        <label for="otp">Enter OTP:</label>
+        <input type="text" id="otp" placeholder="Enter 6-digit OTP">
+        <button onclick="verifyOtp()">Verify OTP</button>
+    </div>
+
+    <p id="message"></p>
+</div>
+
+<script>
+    const baseUrl = "http://localhost:8080/api/v1/mail/user";
+
+    // Function to Send OTP
+    function sendOtp() {
+        const email = document.getElementById("email").value;
+
+        if (!email) {
+            alert("Please enter an email.");
+            return;
+        }
+
+        fetch(`${baseUrl}/send-otp?email=${email}`, {
+            method: "POST",
+        })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById("message").innerText = data;
+            document.getElementById("otp-section").style.display = "block";
+        })
+        .catch(error => console.error("Error sending OTP:", error));
+    }
+
+    // Function to Verify OTP
+    function verifyOtp() {
+        const email = document.getElementById("email").value;
+        const otp = document.getElementById("otp").value;
+
+        if (!otp) {
+            alert("Please enter the OTP.");
+            return;
+        }
+
+        fetch(`${baseUrl}/verify-otp?email=${email}&otp=${otp}`, {
+            method: "POST",
+        })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById("message").innerText = data;
+            if (data.includes("Verified")) {
+                document.getElementById("message").style.color = "green";
+            } else {
+                document.getElementById("message").style.color = "red";
+            }
+        })
+        .catch(error => console.error("Error verifying OTP:", error));
+    }
+
+</script>
+</body>
+</html>
